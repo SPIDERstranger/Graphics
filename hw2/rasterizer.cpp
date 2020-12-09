@@ -40,7 +40,7 @@ auto to_vec4(const Eigen::Vector3f& v3, float w = 1.0f)
 }
 
 
-static bool insideTriangle(int x, int y, const Vector3f* _v)
+static bool insideTriangle(float x, float y, const Vector3f* _v)
 {   
     // TODO : Implement this function to check if the point (x, y) is inside the triangle represented by _v[0], _v[1], _v[2]
     Vector3f point(x,y,0);
@@ -148,11 +148,11 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
             for(int j = min.y();j<=max.y();++j)
             {
                 float count = 0;
-                float dir[4][2]={{-0.25,0.25},{-0.25,0.25},{-0.25,0.25},{-0.25,0.25}};
+                float dir[4][2]={{-0.25,0.25},{0.25,0.25},{0.25,-0.25},{-0.25,-0.25}};
                 for(int k = 0;k<4;++k)
                 {
-                    //todo
-                    if(insideTriangle(i+dir[i][0],j+dir[i][1],t.v))
+                    // todo 
+                    if(insideTriangle(static_cast<float>(i)+dir[i][0],static_cast<float>(j)+dir[i][1],t.v))
                         count+=1;
                 }
                 if(count>0)
