@@ -105,7 +105,7 @@ Eigen::Matrix4f get_rotation(Eigen::Vector3f axis,float angle)
     model = model*cos(rotate) +(1-cos(rotate))*axis*axis.transpose() + sin(rotate)*n;
     Eigen::Matrix4f result=Eigen::Matrix4f::Identity();
     result.block(0,0,3,3) = model;
-    return model;
+    return result;
 }
 int main(int argc, const char **argv)
 {
