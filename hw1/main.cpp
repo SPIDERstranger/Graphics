@@ -84,9 +84,9 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 
     //计算正交移动
     Eigen::Matrix4f oMove = Eigen::Matrix4f::Identity();
-    oMove(0, 3) = (right + left) / 2.0;
-    oMove(1, 3) = (top + bottom) / 2.0;
-    oMove(2, 3) = (zNear + zFar) / 2.0;
+    oMove(0, 3) = -(right + left) / 2.0;
+    oMove(1, 3) = -(top + bottom) / 2.0;
+    oMove(2, 3) = -(zNear + zFar) / 2.0;
 
     projection = oScale * oMove * pto * projection;
 

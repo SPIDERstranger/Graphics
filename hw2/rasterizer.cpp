@@ -141,22 +141,51 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     
     // TODO : Find out the bounding box of current triangle.
     // iterate through the pixel and find if the current pixel is inside the triangle
-    
-    for(int i = min.x();i<=max.x();++i)
+    if(MSAA)
     {
-        for(int j = min.y();j<=max.y();++j)
+        for(int i = min.x();i<=max.x();++i)
         {
-            //判断是否在三角形内
-            if(insideTriangle(i,j,t.v))
+            for(int j = min.y();j<=max.y();++j)
             {
-                auto [alpha,beta,gamma] = computeBarycentric2D(i,j,t.v);
-                float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
-                float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
-                z_interpolated *= w_reciprocal;
-                auto index =get_index(i,j);
-                if(depth_buf[index]>z_interpolated){
-                    depth_buf[index] = z_interpolated;
-                    set_pixel(Vector3f(i,j,z_interpolated),t.getColor());
+                float count = 0;
+                int dir[][]={{-0.25,0.25},{-0.25,0.25},{-0.25,0.25},{-0.25,0.25}};
+                for(int k = 0;k<4;++k)
+                {
+                    if(insideTriangle(x+dir[i][0],y+dir[i][1],t.v))
+                        count+=1;
+                }
+                if(count>0)
+                {
+                    auto [alpha,beta,gamma] = computeBarycentric2D(i,j,t.v);
+                    float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+                    float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                    z_interpolated *= w_reciprocal;
+                    auto index =get_index(i,j);
+                    if(depth_buf[index]>z_interpolated){
+                        depth_buf[index] = z_interpolated;
+                        set_pixel(Vector3f(i,j,z_interpolated),t.getColor()*count*0.25);
+                    }
+                }
+            }
+        }
+    }
+    else{
+        for(int i = min.x();i<=max.x();++i)
+        {
+            for(int j = min.y();j<=max.y();++j)
+            {
+                //判断是否在三角形内
+                if(insideTriangle(i,j,t.v))
+                {
+                    auto [alpha,beta,gamma] = computeBarycentric2D(i,j,t.v);
+                    float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+                    float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                    z_interpolated *= w_reciprocal;
+                    auto index =get_index(i,j);
+                    if(depth_buf[index]>z_interpolated){
+                        depth_buf[index] = z_interpolated;
+                        set_pixel(Vector3f(i,j,z_interpolated),t.getColor());
+                    }
                 }
             }
         }
