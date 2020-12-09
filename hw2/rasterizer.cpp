@@ -138,7 +138,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
         if(point.x() < min.x()) min[0] = floor(point.x());
         if(point.y() < min.y()) min[1] = floor(point.y());
     }
-    bool MSAA = true;
+    bool MSAA = false;
     // TODO : Find out the bounding box of current triangle.
     // iterate through the pixel and find if the current pixel is inside the triangle
     if(MSAA)
@@ -152,7 +152,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                 for(int k = 0;k<4;++k)
                 {
                     // todo 
-                    if(insideTriangle(static_cast<float>(i)+dir[i][0],static_cast<float>(j)+dir[i][1],t.v))
+                    if(insideTriangle(static_cast<float>(i)+dir[k][0],static_cast<float>(j)+dir[k][1],t.v))
                         count+=1;
                 }
                 if(count>0)
@@ -164,6 +164,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                     auto index =get_index(i,j);
                     if(depth_buf[index]>z_interpolated){
                         depth_buf[index] = z_interpolated;
+                        // todo 需要设置
                         set_pixel(Vector3f(i,j,z_interpolated),t.getColor()*count*0.25);
                     }
                 }
