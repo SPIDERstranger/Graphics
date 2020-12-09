@@ -93,6 +93,20 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     return projection;
 }
 
+
+Eigen::Matrix4f get_rotation(Eigen::Vector3f axis,float angle)
+{
+    Eigen::Matrix3f model = Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f n;
+    n<<0,-axis.z(),axis.y(),
+    axis.z(),0,-axis.z(),
+    -axis.y(),axis.z(),0;
+    float rotate = MY_PI*angle/180.0;
+    model = model*cos(rotate) +(1-cos(rotate))*axis*axis.transpose() + sin(rotate)*n;
+    Eigen::Matrix4f result=Eigen::Matrix4f::Identity();
+    result.block(0,0,3,3) = model;
+    return model;
+}
 int main(int argc, const char **argv)
 {
     float angle = 0;
