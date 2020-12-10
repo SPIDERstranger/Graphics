@@ -178,7 +178,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
         if(point.x() < min.x()) min[0] = floor(point.x());
         if(point.y() < min.y()) min[1] = floor(point.y());
     }
-    bool MSAA = false;
+    bool MSAA = true;
     // TODO : Find out the bounding box of current triangle.
     // iterate through the pixel and find if the current pixel is inside the triangle
     if(MSAA)
@@ -194,6 +194,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                     if(insideTriangle(static_cast<float>(i)+dir[k][0],static_cast<float>(j)+dir[k][1],t.v))
                         count+=1;
                 }
+                // std::cout<<"count"<<count<<std::endl;
                 if(count>0)
                 {
                     auto [alpha,beta,gamma] = computeBarycentric2D(i,j,t.v);
@@ -201,10 +202,12 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                     float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
                     z_interpolated *= w_reciprocal;
                     auto index =get_index(i,j);
+                    // std::cout<<"z_interpolated"<<z_interpolated<<std::endl;
                     if(depth_buf[index]>z_interpolated){
                         depth_buf[index] = z_interpolated;
                         // todo  需要验证
                         setMSAAColor(index,z_interpolated,count*0.25,t.getColor());
+                        // std::cout<<"get "<< getMSAAColor(index) <<std::endl;
                         set_pixel(Vector3f(i,j,z_interpolated),getMSAAColor(index));
 
                     }
@@ -259,6 +262,7 @@ void rst::rasterizer::set_projection(const Eigen::Matrix4f& p)
 
 void rst::rasterizer::clear(rst::Buffers buff)
 {
+    msaa_buf.clear();
     if ((buff & rst::Buffers::Color) == rst::Buffers::Color)
     {
         std::fill(frame_buf.begin(), frame_buf.end(), Eigen::Vector3f{0, 0, 0});

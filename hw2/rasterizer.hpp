@@ -100,7 +100,7 @@ namespace rst
         std::map<int, std::vector<Eigen::Vector3f>> col_buf;
 
 
-        std::map<int, std::list<msaa_data>> msaa_buf;
+        std::map<int, std::list<rst::msaa_data>> msaa_buf;
 
         std::vector<Eigen::Vector3f> frame_buf;
 
