@@ -205,12 +205,12 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                     // std::cout<<"z_interpolated"<<z_interpolated<<std::endl;
                     if(depth_buf[index]>z_interpolated){
                         depth_buf[index] = z_interpolated;
-                        // todo  需要验证
-                        setMSAAColor(index,z_interpolated,count*0.25,t.getColor());
-                        // std::cout<<"get "<< getMSAAColor(index) <<std::endl;
-                        set_pixel(Vector3f(i,j,z_interpolated),getMSAAColor(index));
-
                     }
+                    setMSAAColor(index,z_interpolated,count*0.25,t.getColor());
+                    // std::cout<<"get "<< getMSAAColor(index) <<std::endl;
+                    set_pixel(Vector3f(i,j,z_interpolated),getMSAAColor(index));
+
+                    
                 }
             }
         }

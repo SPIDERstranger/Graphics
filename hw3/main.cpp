@@ -60,6 +60,16 @@ Eigen::Matrix4f get_model_matrix(float angle)
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar)
 {
     // TODO: Use the same projection matrix from the previous assignments
+    Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f pto ;
+    pto << zNear,0,0,0,
+        0,zNear,0,0,
+        0,0,zFar+zNear,-zFar*zNear,
+        0,0,1,0;
+
+    float top,buttom,right,left;
+
+    //todo jisuan 
 
 }
 
