@@ -54,6 +54,12 @@ namespace rst
         int col_id = 0;
     };
 
+    struct msaa_data{
+        float z_depth;
+        float precent;
+        Eigen::Vector3f color;
+    };
+
     class rasterizer
     {
     public:
@@ -79,6 +85,9 @@ namespace rst
 
         void rasterize_triangle(const Triangle& t);
 
+        void setMSAAColor(int index,float depth,float precent,Vector3f color);
+        Eigen::Vector3f getMSAAColor(int index);
+
         // VERTEX SHADER -> MVP -> Clipping -> /.W -> VIEWPORT -> DRAWLINE/DRAWTRI -> FRAGSHADER
 
     private:
@@ -89,6 +98,9 @@ namespace rst
         std::map<int, std::vector<Eigen::Vector3f>> pos_buf;
         std::map<int, std::vector<Eigen::Vector3i>> ind_buf;
         std::map<int, std::vector<Eigen::Vector3f>> col_buf;
+
+
+        std::map<int, std::list<msaa_data>> msaa_buf;
 
         std::vector<Eigen::Vector3f> frame_buf;
 

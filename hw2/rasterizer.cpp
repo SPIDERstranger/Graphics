@@ -123,6 +123,46 @@ void rst::rasterizer::draw(pos_buf_id pos_buffer, ind_buf_id ind_buffer, col_buf
         rasterize_triangle(t);
     }
 }
+
+Eigen::Vector3f  rst::rasterizer::getMSAAColor(int index){
+    std::list<rst::msaa_data>& buff  = msaa_buf[index];
+    Vector3f color = Vector3f::Zero();
+    for(auto a = buff.rbegin();a!=buff.rend();++a)
+    {
+        if(a->precent>=1)
+        {
+            color = a->color;
+        }
+        else{
+            color = (color)*(1-(a->precent))+(a->color)*(a->precent);
+        }
+    }
+    return color;
+}
+
+void rst::rasterizer::setMSAAColor(int index,float depth,float precent,Vector3f color){
+    std::list<rst::msaa_data>& buff  = msaa_buf[index];
+    auto a = buff.begin();
+    bool flag = false;
+    for(;a!=buff.end();++a)
+    {
+        if(depth<=(a->z_depth))
+        {
+            flag = true;
+            buff.insert(a,{depth,precent,color});
+            while(precent>=1&&a!=buff.end())
+            {
+                buff.erase(a);
+            }
+            break;
+        }
+    }
+    if(flag == false)
+    {
+        buff.push_back({depth,precent,color});
+    }
+}
+
 //Screen space rasterization
 void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     auto v = t.toVector4();
@@ -151,7 +191,6 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                 float dir[4][2]={{-0.25,0.25},{0.25,0.25},{0.25,-0.25},{-0.25,-0.25}};
                 for(int k = 0;k<4;++k)
                 {
-                    // todo 
                     if(insideTriangle(static_cast<float>(i)+dir[k][0],static_cast<float>(j)+dir[k][1],t.v))
                         count+=1;
                 }
@@ -164,8 +203,10 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                     auto index =get_index(i,j);
                     if(depth_buf[index]>z_interpolated){
                         depth_buf[index] = z_interpolated;
-                        // todo 需要设置
-                        set_pixel(Vector3f(i,j,z_interpolated),t.getColor()*count*0.25);
+                        // todo  需要验证
+                        setMSAAColor(index,z_interpolated,count*0.25,t.getColor());
+                        set_pixel(Vector3f(i,j,z_interpolated),getMSAAColor(index));
+
                     }
                 }
             }
