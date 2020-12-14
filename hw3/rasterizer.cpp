@@ -257,6 +257,7 @@ static Eigen::Vector2f interpolate(float alpha, float beta, float gamma, const E
 }
 
 //Screen space rasterization
+// view_pos 
 void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eigen::Vector3f, 3>& view_pos) 
 {
     // TODO: From your HW3, get the triangle rasterization code.
@@ -264,6 +265,69 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
     //    * v[i].w() is the vertex view space depth value z.
     //    * Z is interpolated view space depth for the current pixel
     //    * zp is depth between zNear and zFar, used for z-buffer
+    Vector2i areaMax,areaMin;
+    areaMax<< std::ceil( t.v[0].x()),std::ceil( t.v[0].y());
+    areaMin<< std::floor(t.v[0].x()),std::floor( t.v[0].y());
+    auto v = t.toVector4();
+    for(int i =0;i<3;++i)
+    {
+        if(t.v[i].x() > areaMax.x()) areaMax[0] = ceil (t.v[i].x());
+        if(t.v[i].y() > areaMax.y()) areaMax[1] = ceil (t.v[i].y());
+        if(t.v[i].x() < areaMin.x()) areaMin[0] = floor(t.v[i].x());
+        if(t.v[i].y() < areaMin.y()) areaMin[1] = floor(t.v[i].y());
+    }
+    // std::cout<< "get boundBox"<<std::endl;
+    for(int x = areaMin.x();x<=areaMax.x();++x)
+    {
+        for(int y = areaMin.y();y<=areaMax.y();++y)
+        {
+            if(insideTriangle(x,y,t.v))
+            {
+                // std::cout<< "this is in triangle"<<std::endl;
+
+                auto [alpha,beta,gamma] = computeBarycentric2D(x,y,t.v);
+                // std::cout<< "this is in triangle"<<std::endl;
+                
+                float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+                float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                z_interpolated *= w_reciprocal;
+                auto index = get_index(x,y);
+                // std::cout<< "this is in get" << index<<std::endl;
+                // std::cout<< "maxbound : "<<std::endl<<areaMax<<std::endl;
+                // std::cout<< "minbound : "<<std::endl<<areaMin<<std::endl;
+
+                if(z_interpolated <depth_buf[index])
+                {
+                    // std::cout<< "it should draw"<<std::endl;
+
+                    depth_buf[index] = z_interpolated;
+                    // std::cout<< "cal _color"<<std::endl;
+
+                    // 获取颜色插值
+                    auto interpolated_color =  alpha* t.color[0] + beta*t.color[1] + gamma*t.color[2];
+                    // std::cout<< "cal normal"<<std::endl;
+
+                    // 获取法线贴图的插值
+                    auto interpolated_normal = alpha* t.normal[0] + beta*t.normal[1] + gamma*t.normal[2];
+                    // std::cout<< "cal texcoords"<<std::endl;
+
+                    // 获取texture的坐标插值
+                    auto interpolated_texcoords = alpha* t.tex_coords[0] + beta*t.tex_coords[1] + gamma*t.tex_coords[2];
+                    // std::cout<< "cal interpolated_shadingcoords"<<std::endl;
+
+                    // 获取shading的坐标插值位置
+                    auto interpolated_shadingcoords = alpha* view_pos[0] + beta*view_pos[1] + gamma*view_pos[2];
+                    fragment_shader_payload payload(interpolated_color,interpolated_normal,interpolated_texcoords, texture ? &*texture : nullptr);
+                    payload.view_pos = interpolated_shadingcoords;
+
+                    Vector3f pixel_color = fragment_shader(payload);
+                    set_pixel(Vector2i(x,y),pixel_color);
+                }
+            }
+        }
+
+    }
+
 
     // float Z = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
     // float zp = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();

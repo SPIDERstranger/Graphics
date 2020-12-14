@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include<eigen3/Eigen/Core>
 
 using namespace std;
 
@@ -11,7 +11,9 @@ int main(){
         cout<<a<<endl;
         cin>>a;
     }
-
+    Eigen::Vector4f b;
+    b<<1,1,1,1;
+    b.template head<3>();
 
 
 }
