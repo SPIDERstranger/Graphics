@@ -6,7 +6,7 @@ std::vector<cv::Point2f> control_points;
 
 void mouse_handler(int event, int x, int y, int flags, void *userdata) 
 {
-    if (event == cv::EVENT_LBUTTONDOWN && control_points.size() < 4) 
+    if (event == cv::EVENT_LBUTTONDOWN) 
     {
         std::cout << "Left button of the mouse is clicked - position (" << x << ", "
         << y << ")" << '\n';
@@ -62,33 +62,40 @@ void bezier(const std::vector<cv::Point2f> &control_points, cv::Mat &window)
 
 int main() 
 {
-    cv::Mat window = cv::Mat(700, 700, CV_8UC3, cv::Scalar(0));
-    cv::cvtColor(window, window, cv::COLOR_BGR2RGB);
-    cv::namedWindow("Bezier Curve", cv::WINDOW_AUTOSIZE);
+    // cv::Mat window = cv::Mat(700, 700, CV_8UC3, cv::Scalar(0));
+    // cv::cvtColor(window, window, cv::COLOR_BGR2RGB);
+    // cv::namedWindow("Bezier Curve", cv::WINDOW_AUTOSIZE);
 
-    cv::setMouseCallback("Bezier Curve", mouse_handler, nullptr);
+    // cv::setMouseCallback("Bezier Curve", mouse_handler, nullptr);
 
     int key = -1;
     while (key != 27) 
     {
+        cv::Mat window = cv::Mat(700, 700, CV_8UC3, cv::Scalar(0));
+        cv::cvtColor(window, window, cv::COLOR_BGR2RGB);
+        cv::namedWindow("Bezier Curve", cv::WINDOW_AUTOSIZE);
+        cv::setMouseCallback("Bezier Curve", mouse_handler, nullptr);
         if(key == 's')
             control_points.clear();
         for (auto &point : control_points) 
         {
             cv::circle(window, point, 3, {255, 255, 255}, 3);
         }
-
-        if (control_points.size() == 4) 
+        if(control_points.size()>=3)
         {
-            naive_bezier(control_points, window);
-            //   bezier(control_points, window);
-
-            cv::imshow("Bezier Curve", window);
-            cv::imwrite("my_bezier_curve.png", window);
-            key = cv::waitKey(0);
-
-            return 0;
+            bezier(control_points, window); 
         }
+        // if (control_points.size() == 4) 
+        // {
+        //     naive_bezier(control_points, window);
+        //     //   bezier(control_points, window);
+
+        //     cv::imshow("Bezier Curve", window);
+        //     cv::imwrite("my_bezier_curve.png", window);
+        //     key = cv::waitKey(0);
+
+        //     return 0;
+        // }
 
         cv::imshow("Bezier Curve", window);
         key = cv::waitKey(20);
