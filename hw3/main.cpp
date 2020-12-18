@@ -456,14 +456,15 @@ int main(int argc, const char **argv)
         cv::imshow("image", image);
         cv::imwrite(filename, image);
         key = cv::waitKey(10);
+        std::cout << "frame count: " << frame_count++ << '\n';
 
         if (key == 'a')
         {
-            angle -= 0.1;
+            angle -= 45;
         }
         else if (key == 'd')
         {
-            angle += 0.1;
+            angle += 45;
         }
     }
     return 0;

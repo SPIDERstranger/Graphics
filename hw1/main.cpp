@@ -183,7 +183,7 @@ int main(int argc, const char **argv)
 
         std::cout << "frame count: " << frame_count++ << '\n';
 
-        std::cin >> key;
+        // std::cin >> key;
         if (key == 'a')
         {
             angle += 10;
