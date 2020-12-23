@@ -4,11 +4,10 @@
 
 #include <cstring>
 
-bool equal(const Vector3f& a, const Vector3f& b)
+bool equal(const Vector3f &a, const Vector3f &b)
 {
-    return  a.x == b.x && a.y == b.y&& a.z==b.z;
+    return a.x == b.x && a.y == b.y && a.z == b.z;
 }
-
 
 bool rayTriangleIntersect(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2, const Vector3f &orig,
                           const Vector3f &dir, float &tnear, float &u, float &v)
@@ -19,7 +18,7 @@ bool rayTriangleIntersect(const Vector3f &v0, const Vector3f &v1, const Vector3f
     // Also don't forget to update tnear, u and v.
     //
     // method 1
-    // 
+    //
     // Vector3f planeUp = crossProduct((v1 - v0), (v2 - v0));
     // planeUp = normalize(planeUp);
     // float t = dotProduct((v0 - orig), planeUp) / dotProduct(dir, planeUp);
@@ -34,24 +33,23 @@ bool rayTriangleIntersect(const Vector3f &v0, const Vector3f &v1, const Vector3f
     //
     // method 2
     //
-    auto e1 = v1-v0;
-    auto e2 = v2-v0;
+    auto e1 = v1 - v0;
+    auto e2 = v2 - v0;
     auto s = orig - v0;
-    auto s1 = crossProduct(dir,e2);
-    auto s2 = crossProduct(s,e1);
+    auto s1 = crossProduct(dir, e2);
+    auto s2 = crossProduct(s, e1);
 
-    float div =1.0f /  dotProduct(s1,e1);
-    float t = dotProduct(s2,e2)*div;
-    float b1 = dotProduct(s1,s)*div;
-    float b2 = dotProduct(s2,dir)*div;
-    if(t>0 && b1>0&&b2>0&&(1-b1-b2)>=0)
+    float div = 1.0f / dotProduct(s1, e1);
+    float t = dotProduct(s2, e2) * div;
+    float b1 = dotProduct(s1, s) * div;
+    float b2 = dotProduct(s2, dir) * div;
+    if (t > 0 && b1 > 0 && b2 > 0 && (1 - b1 - b2) >= 0)
     {
         tnear = t;
-        u=b1;
+        u = b1;
         v = b2;
         return true;
     }
-
 
     return false;
 }

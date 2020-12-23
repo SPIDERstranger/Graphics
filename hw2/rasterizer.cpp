@@ -178,7 +178,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
         if(point.x() < min.x()) min[0] = floor(point.x());
         if(point.y() < min.y()) min[1] = floor(point.y());
     }
-    bool MSAA = true;
+    bool MSAA = false;
     // TODO : Find out the bounding box of current triangle.
     // iterate through the pixel and find if the current pixel is inside the triangle
     if(MSAA)
