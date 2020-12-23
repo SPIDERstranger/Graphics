@@ -111,11 +111,7 @@ Intersection BVHAccel::getIntersection(BVHBuildNode *node, const Ray &ray) const
     // TODO Traverse the BVH to find intersection
     // std::cout<<"in get intersection"<<std::endl;
 
-    std::array<int, 3UL> dirNeg;
-    for (int i = 0; i < 3; ++i)
-    {
-        dirNeg[i] = ray.direction[i];
-    }
+    std::array<int, 3UL> dirNeg{ray.direction.x>0,ray.direction.y>0,ray.direction.z>0};
     if (node->bounds.IntersectP(ray, ray.direction_inv, dirNeg))
     {
         // std::cout<<"in get intersection"<<std::endl;
@@ -126,9 +122,21 @@ Intersection BVHAccel::getIntersection(BVHBuildNode *node, const Ray &ray) const
         else
         {
             if (node->left)
-                return getIntersection(node->left,ray);
+            {
+                Intersection temp =getIntersection(node->left,ray);
+                if(temp.happened)
+                {
+                    return temp;
+                }
+            }
             if (node->right)
-                return getIntersection(node->right,ray);
+            {
+                Intersection temp =getIntersection(node->right,ray);
+                if(temp.happened)
+                {
+                    return temp;
+                }
+            }
         }
     }
     Intersection intersec;

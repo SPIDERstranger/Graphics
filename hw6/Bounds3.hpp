@@ -97,17 +97,26 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     // dirIsNeg: ray direction(x,y,z), dirIsNeg=[int(x>0),int(y>0),int(z>0)], use this to simplify your logic
     // TODO test if ray bound intersects
     Vector3f ori= ray.origin;
-    auto tempMax = pMax-ori;
-    auto tempMin = pMin-ori;
+    std::array<float, 3> invdir{invDir.x,invDir.y,invDir.z};
+    std::array<float, 3> tempMax{pMax.x-ori.x,pMax.y-ori.y,pMax.z-ori.z} ;
+    std::array<float, 3> tempMin{pMin.x-ori.x,pMin.y-ori.y,pMin.z-ori.z} ;
+    float tstart=__FLT_MIN__;
+    float tend = __FLT_MAX__;
+    for(int i = 0;i<3;++i)
+    { 
+        if(dirIsNeg[i])
+        {
+            tstart = std::max(tstart,tempMin[i]*invdir[i]);
+            tend = std::min(tend,tempMax[i]*invdir[i]);
+        }
+        else{
+            tstart = std::max(tstart,tempMax[i]*invdir[i]);
+            tend = std::min(tend,tempMin[i]*invdir[i]);
+        }
+    }
+    // std::cout<<"start : " <<tstart<<"  end : "<<tend<<std::endl; 
 
-    float tmax = (tempMax.x) * invDir.x;
-    tmax = std::min(tmax,(tempMax.y) * invDir.y);
-    tmax = std::min(tmax,(tempMax.z) * invDir.z);
-    float tmin = (tempMin.x) * invDir.x;
-    tmin = std::max(tmin,(tempMin.y) * invDir.y);
-    tmin = std::max(tmin,(tempMin.z) * invDir.z);
-
-    return tmax>tmin && tmax>=0;
+    return tend>tstart && tend>=0;
 
 }
 
