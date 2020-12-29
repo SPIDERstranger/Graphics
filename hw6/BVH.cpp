@@ -121,20 +121,31 @@ Intersection BVHAccel::getIntersection(BVHBuildNode *node, const Ray &ray) const
         }
         else
         {
-            if (node->left)
+            Intersection templeft =getIntersection(node->left,ray);
+            Intersection tempright =getIntersection(node->right,ray);
+            // if(templeft.happened)
+            // {
+            //     if(tempright.happened)
+            //     {
+            //         return templeft.distance<tempright.distance?templeft:tempright;
+            //     }else{
+            //         return templeft;
+            //     }
+            // }
+            // else{
+            //     return tempright;
+            // }
+
+            if(templeft.happened&&tempright.happened)
             {
-                Intersection temp =getIntersection(node->left,ray);
-                if(temp.happened)
-                {
-                    return temp;
-                }
+                return templeft.distance<tempright.distance?templeft:tempright;
             }
-            if (node->right)
-            {
-                Intersection temp =getIntersection(node->right,ray);
-                if(temp.happened)
+            else{
+                if(templeft.happened)
                 {
-                    return temp;
+                    return templeft;
+                }else{
+                    return tempright;
                 }
             }
         }
